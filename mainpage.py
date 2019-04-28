@@ -35,12 +35,45 @@ class AppBase(Frame):
         self.master.quit()
 '''
 class Area(Canvas):
-    def buttondown(*args):
-        print(*args)
+    def buttondown(self, event):
+        left_border_cell = event.x
+        top_border_cell = event.y
+        while (left_border_cell - self.start_x) % self.delta_x:
+            left_border_cell -= 1
+        while (top_border_cell - self.start_y) % self.delta_y:
+            top_border_cell -= 1
+        row = (top_border_cell - self.start_y) // self.delta_y
+        column = (left_border_cell - self.start_x) // self.delta_x
+        if matrix_grid[row][column]:
+            matrix_grid[row][column] = 0
+            self.create_rectangle(left_border_cell+1, top_border_cell+1, \
+                left_border_cell+self.delta_x-1, top_border_cell+self.delta_y-1, fill='white',outline='white')
+        else:
+            matrix_grid[row][column] = 1
+            self.create_rectangle(left_border_cell+1, top_border_cell+1, \
+                left_border_cell+self.delta_x-1, top_border_cell+self.delta_y-1, fill='black')
+
+
+
 
     def __init__(self, master=None):
         Canvas.__init__(self, master)
-        self.bind("<Button-1>", self.buttondown)
+        self.bind("<Button-1>", self.buttondown)   
+
+    def create_grid(self, event):
+        self.area_width = self.winfo_width()
+        self.area_height = self.winfo_height()
+        self.delta_x = int((self.area_width-5)/50)
+        self.start_x = 2
+        self.finish_x = self.area_width-3
+        self.delta_y = int((self.area_height-5)/30)
+        self.start_y = 2
+        self.finish_y = self.area_height-3
+        self.create_rectangle(self.start_x, self.start_y, self.finish_x, self.finish_y, fill='white')
+        for x in range(self.start_x+self.delta_x, self.finish_x, self.delta_x):
+            self.create_line(x, self.start_y+1, x, self.finish_y, fill='lightgray')
+        for y in range(self.start_y+self.delta_y, self.finish_y, self.delta_y):
+            self.create_line(self.start_x+1, y, self.finish_x, y, fill='lightgray') 
     
 
 class App(AppBase):
@@ -48,8 +81,9 @@ class App(AppBase):
         self.Canvas = Area(self)
         self.Canvas.grid(row=0, column=0, rowspan=7, sticky = N+E+S+W)
         self.Canvas.update()
-        self.Canvas.bind("<Configure>", self.create_area)
+        self.Canvas.bind("<Configure>", self.Canvas.create_grid)
         self.create_buttons()
+
 
     def create_buttons(self):
         self.Start = Button(self, text="Start")
@@ -64,22 +98,10 @@ class App(AppBase):
         self.AddPattern.grid(row=5, column=1, sticky=E+W, padx=5, pady=7)
 
 
-    def create_area(self, event):
-        area_width = self.Canvas.winfo_width()
-        area_height = self.Canvas.winfo_height()
-        delta_x = int((area_width-5)/50)
-        start_x = 2
-        finish_x = area_width-3
-        delta_y = int((area_height-5)/30)
-        start_y = 2
-        finish_y = area_height-3
-        self.Canvas.create_rectangle(start_x, start_y, finish_x, finish_y, fill='white')
-        for x in range(start_x+delta_x, finish_x, delta_x):
-            self.Canvas.create_line(x, start_y+1, x, finish_y, fill='lightgray')
-        for y in range(start_y+delta_y, finish_y, delta_y):
-            self.Canvas.create_line(start_x+1, y, finish_x, y, fill='lightgray')
 
 
+matrix_grid = [[0 for i in range(50)] for j in range(30)]
 
 Tick = App()
 Tick.mainloop()
+
