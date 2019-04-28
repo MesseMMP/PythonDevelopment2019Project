@@ -48,9 +48,8 @@ class App(AppBase):
         self.Canvas = Area(self)
         self.Canvas.grid(row=0, column=0, rowspan=7, sticky = N+E+S+W)
         self.Canvas.update()
-        #self.Canvas.bind("<Configure>", self.create_area)
+        self.Canvas.bind("<Configure>", self.create_area)
         self.create_buttons()
-        self.create_area()
 
     def create_buttons(self):
         self.Start = Button(self, text="Start")
@@ -65,7 +64,7 @@ class App(AppBase):
         self.AddPattern.grid(row=5, column=1, sticky=E+W, padx=5, pady=7)
 
 
-    def create_area(self):
+    def create_area(self, event):
         area_width = self.Canvas.winfo_width()
         area_height = self.Canvas.winfo_height()
         delta_x = int((area_width-5)/50)
