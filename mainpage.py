@@ -58,18 +58,18 @@ class Area(Canvas):
 
     def __init__(self, master=None):
         Canvas.__init__(self, master)
-        self.bind("<Button-1>", self.buttondown)   
-
-    def create_grid(self, event):
-        self.area_width = self.winfo_width()
-        self.area_height = self.winfo_height()
-        self.delta_x = int((self.area_width-5)/50)
+        self.bind("<Button-1>", self.buttondown)  
+        self.delta_x = 15
+        self.delta_y = 15 
         self.start_x = 2
-        self.finish_x = self.area_width-3
-        self.delta_y = int((self.area_height-5)/30)
         self.start_y = 2
+
+    def create_grid(self):
+        self.area_width = 200*self.delta_x
+        self.area_height = 150*self.delta_y
+        self.finish_x = self.area_width-3
         self.finish_y = self.area_height-3
-        self.create_rectangle(self.start_x, self.start_y, self.finish_x, self.finish_y, fill='white')
+        self.create_rectangle(self.start_x, self.start_y, self.finish_x, self.finish_y, fill='white', outline='white')
         for x in range(self.start_x+self.delta_x, self.finish_x, self.delta_x):
             self.create_line(x, self.start_y+1, x, self.finish_y, fill='lightgray')
         for y in range(self.start_y+self.delta_y, self.finish_y, self.delta_y):
@@ -81,7 +81,7 @@ class App(AppBase):
         self.Canvas = Area(self)
         self.Canvas.grid(row=0, column=0, rowspan=7, sticky = N+E+S+W)
         self.Canvas.update()
-        self.Canvas.bind("<Configure>", self.Canvas.create_grid)
+        self.Canvas.create_grid()
         self.create_buttons()
 
 
@@ -100,7 +100,7 @@ class App(AppBase):
 
 
 
-matrix_grid = [[0 for i in range(50)] for j in range(30)]
+matrix_grid = [[0 for i in range(200)] for j in range(150)]
 
 Tick = App()
 Tick.mainloop()
