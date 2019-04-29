@@ -1,5 +1,5 @@
 import time
-import logic
+import logic as lg
 from tkinter import *
 from threading import Thread, Event
 '''
@@ -75,6 +75,26 @@ class Area(Canvas):
             self.create_line(x, self.start_y+1, x, self.finish_y, fill='lightgray')
         for y in range(self.start_y+self.delta_y, self.finish_y, self.delta_y):
             self.create_line(self.start_x+1, y, self.finish_x, y, fill='lightgray') 
+
+
+    def draw_cells(self, matrix):
+        for row, row_cells in enumerate(matrix):
+            for col, cell in enumerate(row_cells):
+                if cell:
+                    self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
+                        self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='black')
+                else:
+                    self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
+                        self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
+
+
+    def draw_cells_life_dead(self, life, dead):
+        for row, col in life:
+            self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
+                self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='black')
+        for row, col in dead:
+            self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
+                self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
     
 
 class App(AppBase):
@@ -91,12 +111,19 @@ class App(AppBase):
         self.Start.grid(row=1, column=1, sticky=E+W, padx=5, pady=7)
         self.Stop = Button(self, text="Stop")
         self.Stop.grid(row=2, column=1, sticky=E+W, padx=5, pady=7)
-        self.Step = Button(self, text="Step")
+        self.Step = Button(self, text="Step", command=self.one_step)
         self.Step.grid(row=3, column=1, sticky=E+W, padx=5, pady=7)
         self.Clear = Button(self, text="Clear")
         self.Clear.grid(row=4, column=1, sticky=E+W, padx=5, pady=7)
         self.AddPattern = Button(self, text="AddPattern")
         self.AddPattern.grid(row=5, column=1, sticky=E+W, padx=5, pady=7)
+
+
+    def one_step(self):
+        global matrix_grid
+        life_list, dead_list, matrix_grid = lg.one_step_life_dead(matrix_grid)
+        self.Canvas.draw_cells_life_dead(life_list, dead_list)
+
 
 ROW_MATRIX = 150
 COLUMN_MATRIX = 200
