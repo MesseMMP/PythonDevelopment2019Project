@@ -1,4 +1,5 @@
 import time
+import logic
 from tkinter import *
 from threading import Thread, Event
 '''
@@ -65,8 +66,8 @@ class Area(Canvas):
         self.start_y = 2
 
     def create_grid(self):
-        self.area_width = 200*self.delta_x
-        self.area_height = 150*self.delta_y
+        self.area_width = COLUMN_MATRIX*self.delta_x
+        self.area_height = ROW_MATRIX*self.delta_y
         self.finish_x = self.area_width-3
         self.finish_y = self.area_height-3
         self.create_rectangle(self.start_x, self.start_y, self.finish_x, self.finish_y, fill='white', outline='white')
@@ -97,10 +98,11 @@ class App(AppBase):
         self.AddPattern = Button(self, text="AddPattern")
         self.AddPattern.grid(row=5, column=1, sticky=E+W, padx=5, pady=7)
 
+ROW_MATRIX = 150
+COLUMN_MATRIX = 200
 
 
-
-matrix_grid = [[0 for i in range(200)] for j in range(150)]
+matrix_grid = [[0 for i in range(COLUMN_MATRIX)] for j in range(ROW_MATRIX)]
 
 Tick = App()
 Tick.mainloop()
