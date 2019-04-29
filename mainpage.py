@@ -48,11 +48,13 @@ class Area(Canvas):
         if matrix_grid[row][column]:
             matrix_grid[row][column] = 0
             self.create_rectangle(left_border_cell+1, top_border_cell+1, \
-                left_border_cell+self.delta_x-1, top_border_cell+self.delta_y-1, fill='white',outline='white')
+                left_border_cell+self.delta_x-1, top_border_cell+self.delta_y-1, \
+                fill='white',outline='white')
         else:
             matrix_grid[row][column] = 1
             self.create_rectangle(left_border_cell+1, top_border_cell+1, \
-                left_border_cell+self.delta_x-1, top_border_cell+self.delta_y-1, fill='black')
+                left_border_cell+self.delta_x-1, top_border_cell+self.delta_y-1, \
+                fill='black')
 
 
 
@@ -70,7 +72,8 @@ class Area(Canvas):
         self.area_height = ROW_MATRIX*self.delta_y
         self.finish_x = self.area_width-3
         self.finish_y = self.area_height-3
-        self.create_rectangle(self.start_x, self.start_y, self.finish_x, self.finish_y, fill='white', outline='white')
+        self.create_rectangle(self.start_x, self.start_y, self.finish_x, \
+            self.finish_y, fill='white', outline='white')
         for x in range(self.start_x+self.delta_x, self.finish_x, self.delta_x):
             self.create_line(x, self.start_y+1, x, self.finish_y, fill='lightgray')
         for y in range(self.start_y+self.delta_y, self.finish_y, self.delta_y):
@@ -81,21 +84,36 @@ class Area(Canvas):
         for row, row_cells in enumerate(matrix):
             for col, cell in enumerate(row_cells):
                 if cell:
-                    self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
-                        self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='black')
+                    self.create_rectangle(self.start_x+col*self.delta_x+1, \
+                        self.start_y+row*self.delta_y+1,self.start_x+(col+1)*self.delta_x-1, \
+                        self.start_y+(row+1)*self.delta_y-1, fill='black')
                 else:
-                    self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
-                        self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
+                    self.create_rectangle(self.start_x+col*self.delta_x+1, \
+                        self.start_y+row*self.delta_y+1, self.start_x+(col+1)*self.delta_x-1, \
+                        self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
 
 
     def draw_cells_life_dead(self, life, dead):
         for row, col in life:
-            self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
-                self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='black')
+            self.create_rectangle(self.start_x+col*self.delta_x+1, \
+                self.start_y+row*self.delta_y+1, self.start_x+(col+1)*self.delta_x-1, \
+                self.start_y+(row+1)*self.delta_y-1, fill='black')
         for row, col in dead:
-            self.create_rectangle(self.start_x+col*self.delta_x+1, self.start_y+row*self.delta_y+1, \
-                self.start_x+(col+1)*self.delta_x-1, self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
-    
+            self.create_rectangle(self.start_x+col*self.delta_x+1, \
+                self.start_y+row*self.delta_y+1, self.start_x+(col+1)*self.delta_x-1, \
+                self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
+
+    def clear(self, matrix):
+        new_matrix = [[0 for i in range(COLUMN_MATRIX)] for j in range(ROW_MATRIX)]
+        for row, rows_cells in enumerate(matrix):
+            for col, cell in enumerate(rows_cells):
+                if cell:
+                    self.create_rectangle(self.start_x+col*self.delta_x+1, \
+                        self.start_y+row*self.delta_y+1, self.start_x+(col+1)*self.delta_x-1, \
+                        self.start_y+(row+1)*self.delta_y-1, fill='white',outline='white')
+        return new_matrix
+
+
 
 class App(AppBase):
     def create(self):
@@ -113,7 +131,7 @@ class App(AppBase):
         self.Stop.grid(row=2, column=1, sticky=E+W, padx=5, pady=7)
         self.Step = Button(self, text="Step", command=self.one_step)
         self.Step.grid(row=3, column=1, sticky=E+W, padx=5, pady=7)
-        self.Clear = Button(self, text="Clear")
+        self.Clear = Button(self, text="Clear", command=self.clear)
         self.Clear.grid(row=4, column=1, sticky=E+W, padx=5, pady=7)
         self.AddPattern = Button(self, text="AddPattern")
         self.AddPattern.grid(row=5, column=1, sticky=E+W, padx=5, pady=7)
@@ -124,10 +142,14 @@ class App(AppBase):
         life_list, dead_list, matrix_grid = lg.one_step_life_dead(matrix_grid)
         self.Canvas.draw_cells_life_dead(life_list, dead_list)
 
+    def clear(self):
+        global matrix_grid
+        matrix_grid = self.Canvas.clear(matrix_grid)
+
+
 
 ROW_MATRIX = 150
 COLUMN_MATRIX = 200
-
 
 matrix_grid = [[0 for i in range(COLUMN_MATRIX)] for j in range(ROW_MATRIX)]
 
