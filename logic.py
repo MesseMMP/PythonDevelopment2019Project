@@ -2,17 +2,7 @@ import doctest
 
 
 def one_step_matrix(matrix):
-    '''
-    >>> one_step([[0,0,0,0],[0,1,1,1],[0,0,1,0],[0,0,0,0]])
-    [[0, 0, 1, 0], [0, 1, 1, 1], [0, 1, 1, 1], [0, 0, 0, 0]]
-
-    >>> one_step([[0,0,0,0,0,0,0],[0,1,0,0,0,0,0],[0,0,0,0,0,1,0],
-                  [0,0,0,0,1,0,0],[0,0,0,0,0,1,0],[0,0,0,0,0,1,0],
-                  [0,0,0,0,0,0,0]])
-    [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0]]
-
+    '''Processing of one step with the return of the area matrix
     '''
     columns = len(matrix[0])
     rows = len(matrix)
@@ -50,19 +40,7 @@ def one_step_matrix(matrix):
 
 
 def one_step_life_dead(matrix):
-    '''
-    >>> one_step([[0,0,0,0],[0,1,1,1],[0,0,1,0],[0,0,0,0]])
-    ([(0, 2), (2, 1), (2, 3)], [], [[0, 0, 1, 0],
-     [0, 1, 1, 1], [0, 1, 1, 1], [0, 0, 0, 0]])
-
-    >>> one_step([[0,0,0,0,0,0,0],[0,1,0,0,0,0,0],[0,0,0,0,0,1,0],
-                  [0,0,0,0,1,0,0],[0,0,0,0,0,1,0],[0,0,0,0,0,1,0],
-                  [0,0,0,0,0,0,0]])
-    ([(3, 5), (4, 4)], [(1, 1), (2, 5), (5, 5)],
-    [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0]])
-
+    '''Processing of one step with the return of the life and dead lists and area matrix
     '''
     columns = len(matrix[0])
     rows = len(matrix)
@@ -102,8 +80,3 @@ def one_step_life_dead(matrix):
                     new_matrix[row][col] = 0
     return life_list, dead_list, new_matrix
 
-
-'''
-if __name__ == '__main__':
-    doctest.testmod()
-    '''
