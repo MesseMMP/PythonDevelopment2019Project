@@ -18,16 +18,21 @@ class AppBase(Frame):
     def create(self):
         raise NotImplementedError
 
+
 class GameGrid(Canvas):
-    def __init__(self, master=None):
+    def __init__(self, master=None, rows=200, columns=200):
         Canvas.__init__(self, master)
-        self.bind("<Button-1>", self.buttondown)
+        self.bind("<Button-1>", self.click_cell)
         self.cell_width = 15
         self.cell_height = 15
         self.start_x = 2
         self.start_y = 2
+        self.rows = rows
+        self.columns = columns
+        self.matrix = [[0 for i in range(columns)] for j in range(rows)]
+        self._create_grid()
 
-    def buttondown(self, event):
+    def click_cell(self, event):
         left_border_cell = event.x
         top_border_cell = event.y
         while (left_border_cell - self.start_x) % self.cell_width:
@@ -36,18 +41,18 @@ class GameGrid(Canvas):
             top_border_cell -= 1
         row = (top_border_cell - self.start_y) // self.cell_height
         column = (left_border_cell - self.start_x) // self.cell_width
-        if matrix_grid[row][column]:
-            matrix_grid[row][column] = 0
+        if self.matrix[row][column]:
+            self.matrix[row][column] = 0
             self._draw_dead_cell(row, column)
         else:
-            matrix_grid[row][column] = 1
+            self.matrix[row][column] = 1
             self._draw_alive_cell(row, column)
 
-    def create_grid(self):
-        self.area_width = COLUMN_MATRIX * self.cell_width
-        self.area_height = ROW_MATRIX * self.cell_height
-        self.finish_x = self.area_width - 3
-        self.finish_y = self.area_height - 3
+    def _create_grid(self):
+        self.grid_height = self.rows * self.cell_height
+        self.grid_width = self.columns * self.cell_width
+        self.finish_x = self.grid_width - 3
+        self.finish_y = self.grid_height - 3
         self.create_rectangle(
             self.start_x,
             self.start_y,
@@ -63,20 +68,19 @@ class GameGrid(Canvas):
         ):
             self.create_line(self.start_x + 1, y, self.finish_x, y, fill="lightgray")
 
-    def draw_cells_life_dead(self, life, dead):
-        for row, column in life:
+    def make_step(self):
+        life_cells, dead_cells, self.matrix = lg.one_step_life_dead(self.matrix)
+        for row, column in life_cells:
             self._draw_alive_cell(row, column)
-        for row, column in dead:
+        for row, column in dead_cells:
             self._draw_dead_cell(row, column)
 
-    def clear(self, matrix):
-        new_matrix = []
-        new_matrix = [[0 for i in range(COLUMN_MATRIX)] for j in range(ROW_MATRIX)]
-        for row, rows_cells in enumerate(matrix):
-            for column, cell in enumerate(rows_cells):
+    def clear(self):
+        for row, row_cells in enumerate(self.matrix):
+            for column, cell in enumerate(row_cells):
+                self.matrix[row][column] = 0
                 if cell:
                     self._draw_dead_cell(row, column)
-        return new_matrix
 
     def _draw_alive_cell(self, row, column):
         self.create_rectangle(
@@ -102,8 +106,6 @@ class App(AppBase):
     def create(self):
         self.game_grid = GameGrid(self)
         self.game_grid.grid(row=0, column=0, rowspan=7, sticky=N + E + S + W)
-        self.game_grid.update()
-        self.game_grid.create_grid()
         self.create_buttons()
 
     def create_buttons(self):
@@ -119,19 +121,11 @@ class App(AppBase):
         self.add_pattern_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
 
     def one_step(self):
-        global matrix_grid
-        life_list, dead_list, matrix_grid = lg.one_step_life_dead(matrix_grid)
-        self.game_grid.draw_cells_life_dead(life_list, dead_list)
+        self.game_grid.make_step()
 
     def clear(self):
-        global matrix_grid
-        matrix_grid = self.game_grid.clear(matrix_grid)
+        self.game_grid.clear()
 
-
-ROW_MATRIX = 150
-COLUMN_MATRIX = 200
-
-matrix_grid = [[0 for i in range(COLUMN_MATRIX)] for j in range(ROW_MATRIX)]
 
 if __name__ == "__main__":
     Tick = App()
