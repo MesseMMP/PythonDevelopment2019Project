@@ -1,5 +1,5 @@
 import logic as lg
-from tkinter import Frame, Canvas, N, E, S, W, Button
+from tkinter import Label, Frame, Canvas, N, E, S, W, Button, IntVar, Entry
 
 
 class AppBase(Frame):
@@ -107,28 +107,54 @@ class App(AppBase):
         self.game_grid = GameGrid(self)
         self.game_grid.grid(row=0, column=0, rowspan=7, sticky=N + E + S + W)
         self.start_call_id = None
-        self.create_buttons()
+        self._create_buttons()
 
-    def create_buttons(self):
+    def _create_buttons(self):
         self.start_button = Button(self, text="Start", command=self.start)
         self.start_button.grid(row=1, column=1, sticky=E + W, padx=5, pady=7)
+        self._create_step_time_frame()
         self.stop_button = Button(self, text="Stop", command=self.stop)
-        self.stop_button.grid(row=2, column=1, sticky=E + W, padx=5, pady=7)
+        self.stop_button.grid(row=3, column=1, sticky=E + W, padx=5, pady=7)
         self.step_button = Button(self, text="Step", command=self.one_step)
-        self.step_button.grid(row=3, column=1, sticky=E + W, padx=5, pady=7)
+        self.step_button.grid(row=4, column=1, sticky=E + W, padx=5, pady=7)
         self.clear_button = Button(self, text="Clear", command=self.clear)
-        self.clear_button.grid(row=4, column=1, sticky=E + W, padx=5, pady=7)
+        self.clear_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
         self.add_pattern_button = Button(self, text="AddPattern")
         self.add_pattern_button.grid(
             row=5, column=1, sticky=E + W, padx=5, pady=7
         )
 
+    def _create_step_time_frame(self):
+        self.step_time_frame = Frame(self)
+        self.step_time_frame.grid(row=2, column=1)
+        self.step_time_label = Label(
+            self.step_time_frame, text="Time of one step is"
+        )
+        self.step_time_label.grid(
+            row=2, column=1, sticky=E + W, padx=5, pady=7
+        )
+        self.step_time_var = IntVar(value=500)
+        self.step_time_entry = Entry(
+            self.step_time_frame, textvariable=self.step_time_var, width=10
+        )
+        self.step_time_entry.grid(
+            row=2, column=2, sticky=E + W, padx=5, pady=7
+        )
+        self.ms_label = Label(self.step_time_frame, text="ms")
+        self.ms_label.grid(row=2, column=3, sticky=E + W, padx=5, pady=7)
+
     def one_step(self):
         self.game_grid.make_step()
 
     def start(self):
+        if self.start_call_id:
+            self.stop()
+        self.step_time = self.step_time_var.get()
+        self.game_cycle()
+
+    def game_cycle(self):
         self.game_grid.make_step()
-        self.start_call_id = self.after(500, self.start)
+        self.start_call_id = self.after(self.step_time, self.game_cycle)
 
     def stop(self):
         if self.start_call_id:
