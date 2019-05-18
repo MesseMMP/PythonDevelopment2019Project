@@ -21,6 +21,7 @@ class GameGrid(Canvas):
     def __init__(self, master=None, rows=200, columns=200):
         Canvas.__init__(self, master)
         self.bind("<Button-1>", self.click_cell)
+        self.bind("<B1-Motion>", self.hold_down_cell)
         self.cell_width = 15
         self.cell_height = 15
         self.start_x = 2
@@ -28,21 +29,27 @@ class GameGrid(Canvas):
         self.rows = rows
         self.columns = columns
         self.matrix = [[0 for i in range(columns)] for j in range(rows)]
+        self.last_drawn_cell = None
         self._create_grid()
 
     def click_cell(self, event):
-        left_border_cell = event.x
-        top_border_cell = event.y
-        while (left_border_cell - self.start_x) % self.cell_width:
-            left_border_cell -= 1
-        while (top_border_cell - self.start_y) % self.cell_height:
-            top_border_cell -= 1
-        row = (top_border_cell - self.start_y) // self.cell_height
-        column = (left_border_cell - self.start_x) // self.cell_width
+        top_border = event.y - (event.y - self.start_y) % self.cell_height
+        left_border = event.x - (event.x - self.start_x) % self.cell_width
+        row = top_border // self.cell_height
+        column = left_border // self.cell_width
         if self.matrix[row][column]:
             self.matrix[row][column] = 0
             self._draw_dead_cell(row, column)
         else:
+            self.matrix[row][column] = 1
+            self._draw_alive_cell(row, column)
+
+    def hold_down_cell(self, event):
+        top_border = event.y - (event.y - self.start_y) % self.cell_height
+        left_border = event.x - (event.x - self.start_x) % self.cell_width
+        row = top_border // self.cell_height
+        column = left_border // self.cell_width
+        if not self.matrix[row][column]:
             self.matrix[row][column] = 1
             self._draw_alive_cell(row, column)
 
@@ -73,10 +80,10 @@ class GameGrid(Canvas):
             )
 
     def make_step(self):
-        life_cells, dead_cells, self.matrix = lg.one_step_life_dead(
+        alive_cells, dead_cells, self.matrix = lg.one_step_life_dead(
             self.matrix
         )
-        for row, column in life_cells:
+        for row, column in alive_cells:
             self._draw_alive_cell(row, column)
         for row, column in dead_cells:
             self._draw_dead_cell(row, column)
