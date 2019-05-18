@@ -1,8 +1,6 @@
-import doctest
-
-
 def one_step_life_dead(matrix):
-    """Processing of one step with the return of the life and dead lists and area matrix
+    """Processing of one step with the return of the life and dead lists and
+    area matrix
     """
     columns = len(matrix[0])
     rows = len(matrix)
@@ -41,4 +39,3 @@ def one_step_life_dead(matrix):
                 else:
                     new_matrix[row][col] = 0
     return life_list, dead_list, new_matrix
-

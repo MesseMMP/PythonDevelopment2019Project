@@ -1,7 +1,5 @@
-import time
 import logic as lg
 from tkinter import Frame, Canvas, N, E, S, W, Button
-from threading import Thread, Event
 
 
 class AppBase(Frame):
@@ -61,15 +59,23 @@ class GameGrid(Canvas):
             fill="white",
             outline="white",
         )
-        for x in range(self.start_x + self.cell_width, self.finish_x, self.cell_width):
-            self.create_line(x, self.start_y + 1, x, self.finish_y, fill="lightgray")
+        for x in range(
+            self.start_x + self.cell_width, self.finish_x, self.cell_width
+        ):
+            self.create_line(
+                x, self.start_y + 1, x, self.finish_y, fill="lightgray"
+            )
         for y in range(
             self.start_y + self.cell_height, self.finish_y, self.cell_height
         ):
-            self.create_line(self.start_x + 1, y, self.finish_x, y, fill="lightgray")
+            self.create_line(
+                self.start_x + 1, y, self.finish_x, y, fill="lightgray"
+            )
 
     def make_step(self):
-        life_cells, dead_cells, self.matrix = lg.one_step_life_dead(self.matrix)
+        life_cells, dead_cells, self.matrix = lg.one_step_life_dead(
+            self.matrix
+        )
         for row, column in life_cells:
             self._draw_alive_cell(row, column)
         for row, column in dead_cells:
@@ -118,7 +124,9 @@ class App(AppBase):
         self.clear_button = Button(self, text="Clear", command=self.clear)
         self.clear_button.grid(row=4, column=1, sticky=E + W, padx=5, pady=7)
         self.add_pattern_button = Button(self, text="AddPattern")
-        self.add_pattern_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
+        self.add_pattern_button.grid(
+            row=5, column=1, sticky=E + W, padx=5, pady=7
+        )
 
     def one_step(self):
         self.game_grid.make_step()
