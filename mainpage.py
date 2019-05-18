@@ -24,8 +24,6 @@ class GameGrid(Canvas):
         self.bind("<B1-Motion>", self.hold_down_cell)
         self.cell_width = 15
         self.cell_height = 15
-        self.start_x = 2
-        self.start_y = 2
         self.rows = rows
         self.columns = columns
         self.matrix = [[0 for i in range(columns)] for j in range(rows)]
@@ -33,8 +31,8 @@ class GameGrid(Canvas):
         self._create_grid()
 
     def click_cell(self, event):
-        top_border = event.y - (event.y - self.start_y) % self.cell_height
-        left_border = event.x - (event.x - self.start_x) % self.cell_width
+        top_border = event.y - event.y % self.cell_height
+        left_border = event.x - event.x % self.cell_width
         row = top_border // self.cell_height
         column = left_border // self.cell_width
         if self.matrix[row][column]:
@@ -45,8 +43,8 @@ class GameGrid(Canvas):
             self._draw_alive_cell(row, column)
 
     def hold_down_cell(self, event):
-        top_border = event.y - (event.y - self.start_y) % self.cell_height
-        left_border = event.x - (event.x - self.start_x) % self.cell_width
+        top_border = event.y - event.y % self.cell_height
+        left_border = event.x - event.x % self.cell_width
         row = top_border // self.cell_height
         column = left_border // self.cell_width
         if not self.matrix[row][column]:
@@ -54,29 +52,27 @@ class GameGrid(Canvas):
             self._draw_alive_cell(row, column)
 
     def _create_grid(self):
-        self.grid_height = self.rows * self.cell_height
         self.grid_width = self.columns * self.cell_width
-        self.finish_x = self.grid_width - 3
-        self.finish_y = self.grid_height - 3
+        self.grid_height = self.rows * self.cell_height
         self.create_rectangle(
-            self.start_x,
-            self.start_y,
-            self.finish_x,
-            self.finish_y,
+            0,
+            0,
+            self.grid_width,
+            self.grid_height,
             fill="white",
             outline="white",
         )
         for x in range(
-            self.start_x + self.cell_width, self.finish_x, self.cell_width
+            self.cell_width, self.grid_width, self.cell_width
         ):
             self.create_line(
-                x, self.start_y + 1, x, self.finish_y, fill="lightgray"
+                x, 0, x, self.grid_height, fill="lightgray"
             )
         for y in range(
-            self.start_y + self.cell_height, self.finish_y, self.cell_height
+            self.cell_height, self.grid_height, self.cell_height
         ):
             self.create_line(
-                self.start_x + 1, y, self.finish_x, y, fill="lightgray"
+                0, y, self.grid_width, y, fill="lightgray"
             )
 
     def make_step(self):
@@ -97,19 +93,19 @@ class GameGrid(Canvas):
 
     def _draw_alive_cell(self, row, column):
         self.create_rectangle(
-            self.start_x + column * self.cell_width + 1,
-            self.start_y + row * self.cell_height + 1,
-            self.start_x + (column + 1) * self.cell_width - 1,
-            self.start_y + (row + 1) * self.cell_height - 1,
+            column * self.cell_width + 1,
+            row * self.cell_height + 1,
+            (column + 1) * self.cell_width - 1,
+            (row + 1) * self.cell_height - 1,
             fill="black",
         )
 
     def _draw_dead_cell(self, row, column):
         self.create_rectangle(
-            self.start_x + column * self.cell_width + 1,
-            self.start_y + row * self.cell_height + 1,
-            self.start_x + (column + 1) * self.cell_width - 1,
-            self.start_y + (row + 1) * self.cell_height - 1,
+            column * self.cell_width + 1,
+            row * self.cell_height + 1,
+            (column + 1) * self.cell_width - 1,
+            (row + 1) * self.cell_height - 1,
             fill="white",
             outline="white",
         )
