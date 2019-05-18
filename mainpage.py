@@ -27,7 +27,6 @@ class GameGrid(Canvas):
         self.rows = rows
         self.columns = columns
         self.matrix = [[0 for i in range(columns)] for j in range(rows)]
-        self.last_drawn_cell = None
         self._create_grid()
 
     def click_cell(self, event):
@@ -62,18 +61,10 @@ class GameGrid(Canvas):
             fill="white",
             outline="white",
         )
-        for x in range(
-            self.cell_width, self.grid_width, self.cell_width
-        ):
-            self.create_line(
-                x, 0, x, self.grid_height, fill="lightgray"
-            )
-        for y in range(
-            self.cell_height, self.grid_height, self.cell_height
-        ):
-            self.create_line(
-                0, y, self.grid_width, y, fill="lightgray"
-            )
+        for x in range(self.cell_width, self.grid_width, self.cell_width):
+            self.create_line(x, 0, x, self.grid_height, fill="lightgray")
+        for y in range(self.cell_height, self.grid_height, self.cell_height):
+            self.create_line(0, y, self.grid_width, y, fill="lightgray")
 
     def make_step(self):
         alive_cells, dead_cells, self.matrix = lg.one_step_life_dead(
@@ -115,12 +106,13 @@ class App(AppBase):
     def create(self):
         self.game_grid = GameGrid(self)
         self.game_grid.grid(row=0, column=0, rowspan=7, sticky=N + E + S + W)
+        self.start_call_id = None
         self.create_buttons()
 
     def create_buttons(self):
-        self.start_button = Button(self, text="Start")
+        self.start_button = Button(self, text="Start", command=self.start)
         self.start_button.grid(row=1, column=1, sticky=E + W, padx=5, pady=7)
-        self.stop_button = Button(self, text="Stop")
+        self.stop_button = Button(self, text="Stop", command=self.stop)
         self.stop_button.grid(row=2, column=1, sticky=E + W, padx=5, pady=7)
         self.step_button = Button(self, text="Step", command=self.one_step)
         self.step_button.grid(row=3, column=1, sticky=E + W, padx=5, pady=7)
@@ -133,6 +125,15 @@ class App(AppBase):
 
     def one_step(self):
         self.game_grid.make_step()
+
+    def start(self):
+        self.game_grid.make_step()
+        self.start_call_id = self.after(500, self.start)
+
+    def stop(self):
+        if self.start_call_id:
+            self.after_cancel(self.start_call_id)
+            self.start_call_id = None
 
     def clear(self):
         self.game_grid.clear()
