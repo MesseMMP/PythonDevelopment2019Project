@@ -1,6 +1,5 @@
 from tkinter import Label, Frame, Canvas, N, E, S, W, Button, IntVar, Entry
-from logic import GameMatrix, one_step_life_dead
-from datetime import datetime
+from logic import GameMatrix
 
 
 class AppBase(Frame):
