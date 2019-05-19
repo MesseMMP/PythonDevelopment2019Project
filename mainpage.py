@@ -24,6 +24,7 @@ class GameGrid(Canvas):
         self.bind("<B1-Motion>", self.hold_down_cell)
         self.cell_width = 15
         self.cell_height = 15
+        self.cell_draws = [[None for c in range(columns)] for r in range(rows)]
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
 
@@ -77,16 +78,21 @@ class GameGrid(Canvas):
             self._draw_dead_cell(row, column)
 
     def _draw_alive_cell(self, row, column):
-        self.create_rectangle(
+        if self.cell_draws[row][column]:
+            self.delete(self.cell_draws[row][column])
+        cell_draw_id = self.create_rectangle(
             column * self.cell_width + 1,
             row * self.cell_height + 1,
             (column + 1) * self.cell_width - 1,
             (row + 1) * self.cell_height - 1,
             fill="black",
         )
+        self.cell_draws[row][column] = cell_draw_id
 
     def _draw_dead_cell(self, row, column):
-        self.create_rectangle(
+        if self.cell_draws[row][column]:
+            self.delete(self.cell_draws[row][column])
+        cell_draw_id = self.create_rectangle(
             column * self.cell_width + 1,
             row * self.cell_height + 1,
             (column + 1) * self.cell_width - 1,
@@ -94,6 +100,7 @@ class GameGrid(Canvas):
             fill="white",
             outline="white",
         )
+        self.cell_draws[row][column] = cell_draw_id
 
 
 class App(AppBase):
