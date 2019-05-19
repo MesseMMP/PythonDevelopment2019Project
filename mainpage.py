@@ -1,5 +1,6 @@
-import logic as lg
 from tkinter import Label, Frame, Canvas, N, E, S, W, Button, IntVar, Entry
+from logic import GameMatrix, one_step_life_dead
+from datetime import datetime
 
 
 class AppBase(Frame):
@@ -24,9 +25,7 @@ class GameGrid(Canvas):
         self.bind("<B1-Motion>", self.hold_down_cell)
         self.cell_width = 15
         self.cell_height = 15
-        self.rows = rows
-        self.columns = columns
-        self.matrix = [[0 for i in range(columns)] for j in range(rows)]
+        self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
 
     def click_cell(self, event):
@@ -34,11 +33,11 @@ class GameGrid(Canvas):
         left_border = event.x - event.x % self.cell_width
         row = top_border // self.cell_height
         column = left_border // self.cell_width
-        if self.matrix[row][column]:
-            self.matrix[row][column] = 0
+        if self.matrix[row, column]:
+            self.matrix[row, column] = False
             self._draw_dead_cell(row, column)
         else:
-            self.matrix[row][column] = 1
+            self.matrix[row, column] = True
             self._draw_alive_cell(row, column)
 
     def hold_down_cell(self, event):
@@ -46,13 +45,13 @@ class GameGrid(Canvas):
         left_border = event.x - event.x % self.cell_width
         row = top_border // self.cell_height
         column = left_border // self.cell_width
-        if not self.matrix[row][column]:
-            self.matrix[row][column] = 1
+        if not self.matrix[row, column]:
+            self.matrix[row, column] = True
             self._draw_alive_cell(row, column)
 
     def _create_grid(self):
-        self.grid_width = self.columns * self.cell_width
-        self.grid_height = self.rows * self.cell_height
+        self.grid_width = self.matrix.columns * self.cell_width
+        self.grid_height = self.matrix.rows * self.cell_height
         self.create_rectangle(
             0,
             0,
@@ -67,20 +66,16 @@ class GameGrid(Canvas):
             self.create_line(0, y, self.grid_width, y, fill="lightgray")
 
     def make_step(self):
-        alive_cells, dead_cells, self.matrix = lg.one_step_life_dead(
-            self.matrix
-        )
-        for row, column in alive_cells:
+        self.matrix.make_step()
+        for row, column in self.matrix.alive:
             self._draw_alive_cell(row, column)
-        for row, column in dead_cells:
+        for row, column in self.matrix.died:
             self._draw_dead_cell(row, column)
 
     def clear(self):
-        for row, row_cells in enumerate(self.matrix):
-            for column, cell in enumerate(row_cells):
-                self.matrix[row][column] = 0
-                if cell:
-                    self._draw_dead_cell(row, column)
+        for row, column in self.matrix.alive:
+            self.matrix[row, column] = False
+            self._draw_dead_cell(row, column)
 
     def _draw_alive_cell(self, row, column):
         self.create_rectangle(

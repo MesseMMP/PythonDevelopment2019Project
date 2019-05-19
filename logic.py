@@ -1,41 +1,71 @@
-def one_step_life_dead(matrix):
-    """Processing of one step with the return of the life and dead lists and
-    area matrix
-    """
-    columns = len(matrix[0])
-    rows = len(matrix)
-    life_list = []
-    dead_list = []
-    new_matrix = [[0 for i in range(columns)] for j in range(rows)]
-    for row, row_cells in enumerate(matrix):
-        for col, cell in enumerate(row_cells):
-            num_life = 0
-            if row:
-                if col:
-                    num_life += 1 if matrix[row - 1][col - 1] else 0
-                if col < columns - 1:
-                    num_life += 1 if matrix[row - 1][col + 1] else 0
-                num_life += 1 if matrix[row - 1][col] else 0
-            if col:
-                if row < rows - 1:
-                    num_life += 1 if matrix[row + 1][col - 1] else 0
-                num_life += 1 if matrix[row][col - 1] else 0
-            if row < rows - 1:
-                num_life += 1 if matrix[row + 1][col] else 0
-                if col < columns - 1:
-                    num_life += 1 if matrix[row + 1][col + 1] else 0
-            if col < columns - 1:
-                num_life += 1 if matrix[row][col + 1] else 0
-            if cell:
-                if num_life == 2 or num_life == 3:
-                    new_matrix[row][col] = 1
-                else:
-                    new_matrix[row][col] = 0
-                    dead_list.append((row, col))
-            else:
-                if num_life == 3:
-                    new_matrix[row][col] = 1
-                    life_list.append((row, col))
-                else:
-                    new_matrix[row][col] = 0
-    return life_list, dead_list, new_matrix
+class GameMatrix:
+    def __init__(self, rows=200, columns=200):
+        self.rows = rows
+        self.columns = columns
+        self.alive = set()
+        self.died = set()
+
+    def __getitem__(self, position):
+        row, column = position
+        return (
+            row > 0
+            and row < self.rows
+            and column > 0
+            and column < self.columns
+            and (row, column) in self.alive
+        )
+
+    def __setitem__(self, position, value):
+        row, column = position
+        if row < 0 or row > self.rows or column < 0 or column > self.columns:
+            return
+        if value is True:
+            self.alive.add((row, column))
+        elif value is False:
+            self.alive.discard((row, column))
+
+    def make_step(self):
+        self.died = set()
+        new_alive = self.alive.copy()
+        for cell in self.alive:
+            alive_neighbours = self.alive_neighbours(cell)
+            if len(alive_neighbours) < 2 or len(alive_neighbours) > 3:
+                new_alive.remove(cell)
+                self.died.add(cell)
+        for cell in self.all_dead_neighbours:
+            alive_neighbours = self.alive_neighbours(cell)
+            if (
+                len(alive_neighbours) == 3
+                and cell[0] > 0
+                and cell[0] < self.rows
+                and cell[1] > 0
+                and cell[1] < self.columns
+            ):
+                new_alive.add(cell)
+        self.alive = new_alive
+
+    @property
+    def all_dead_neighbours(self):
+        res = set()
+        for cell in self.alive:
+            res = res | self.dead_neighbours(cell)
+        return res
+
+    def alive_neighbours(self, cell):
+        return self.neighbours(cell) & self.alive
+
+    def dead_neighbours(self, cell):
+        return self.neighbours(cell) - self.alive
+
+    def neighbours(self, cell):
+        row, column = cell
+        return {
+            (row, column - 1),
+            (row - 1, column),
+            (row - 1, column - 1),
+            (row, column + 1),
+            (row + 1, column),
+            (row + 1, column + 1),
+            (row - 1, column + 1),
+            (row + 1, column - 1),
+        }
