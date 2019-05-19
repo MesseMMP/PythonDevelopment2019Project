@@ -18,7 +18,7 @@ class AppBase(Frame):
 
 
 class GameGrid(Canvas):
-    def __init__(self, master=None, rows=200, columns=200):
+    def __init__(self, master=None, rows=2000, columns=2000):
         Canvas.__init__(self, master)
         self.bind("<Button-1>", self.click_cell)
         self.bind("<B1-Motion>", self.hold_down_cell)
@@ -122,7 +122,7 @@ class App(AppBase):
         self.clear_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
         self.add_pattern_button = Button(self, text="AddPattern")
         self.add_pattern_button.grid(
-            row=5, column=1, sticky=E + W, padx=5, pady=7
+            row=6, column=1, sticky=E + W, padx=5, pady=7
         )
 
     def _create_step_time_frame(self):
