@@ -35,15 +35,27 @@ class GameGrid(Canvas):
         Canvas.__init__(self, master)
         self.bind("<Button-1>", self.click_cell)
         self.bind("<B1-Motion>", self.hold_down_cell)
+        self.bind("<Button-3>", self.right_click)
+        self.bind("<B3-Motion>", self.right_move)
         self.cell_width = 15
         self.cell_height = 15
         self.cell_draws = [[None for c in range(columns)] for r in range(rows)]
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
+        self.shift_x = 0
+        self.shift_y = 0
 
     def click_cell(self, event):
-        top_border = event.y - event.y % self.cell_height
-        left_border = event.x - event.x % self.cell_width
+        top_border = (
+            event.y
+            - (event.y - self.shift_y) % self.cell_height
+            - self.shift_y
+        )
+        left_border = (
+            event.x - (event.x - self.shift_x) % self.cell_width - self.shift_x
+        )
+        if top_border < 0 or left_border < 0:
+            return
         row = top_border // self.cell_height
         column = left_border // self.cell_width
         if self.matrix[row, column]:
@@ -54,13 +66,34 @@ class GameGrid(Canvas):
             self._draw_alive_cell(row, column)
 
     def hold_down_cell(self, event):
-        top_border = event.y - event.y % self.cell_height
-        left_border = event.x - event.x % self.cell_width
+        top_border = (
+            event.y
+            - (event.y - self.shift_y) % self.cell_height
+            - self.shift_y
+        )
+        left_border = (
+            event.x - (event.x - self.shift_x) % self.cell_width - self.shift_x
+        )
+        if top_border < 0 or left_border < 0:
+            return
         row = top_border // self.cell_height
         column = left_border // self.cell_width
         if not self.matrix[row, column]:
             self.matrix[row, column] = True
             self._draw_alive_cell(row, column)
+
+    def right_click(self, event):
+        self.right_x0 = event.x
+        self.right_y0 = event.y
+        self.items = self.find_all()
+
+    def right_move(self, event):
+        for item in self.items:
+            self.move(item, event.x - self.right_x0, event.y - self.right_y0)
+        self.shift_x += event.x - self.right_x0
+        self.shift_y += event.y - self.right_y0
+        self.right_x0 = event.x
+        self.right_y0 = event.y
 
     def _create_grid(self):
         self.grid_width = self.matrix.columns * self.cell_width
@@ -71,7 +104,7 @@ class GameGrid(Canvas):
             self.grid_width,
             self.grid_height,
             fill="white",
-            outline="white",
+            outline="lightgray",
         )
         for x in range(self.cell_width, self.grid_width, self.cell_width):
             self.create_line(x, 0, x, self.grid_height, fill="lightgray")
@@ -99,10 +132,10 @@ class GameGrid(Canvas):
         if self.cell_draws[row][column]:
             self.delete(self.cell_draws[row][column])
         cell_draw_id = self.create_rectangle(
-            column * self.cell_width + 1,
-            row * self.cell_height + 1,
-            (column + 1) * self.cell_width - 1,
-            (row + 1) * self.cell_height - 1,
+            column * self.cell_width + 1 + self.shift_x,
+            row * self.cell_height + 1 + self.shift_y,
+            (column + 1) * self.cell_width - 1 + self.shift_x,
+            (row + 1) * self.cell_height - 1 + self.shift_y,
             fill="black",
         )
         self.cell_draws[row][column] = cell_draw_id
@@ -111,10 +144,10 @@ class GameGrid(Canvas):
         if self.cell_draws[row][column]:
             self.delete(self.cell_draws[row][column])
         cell_draw_id = self.create_rectangle(
-            column * self.cell_width + 1,
-            row * self.cell_height + 1,
-            (column + 1) * self.cell_width - 1,
-            (row + 1) * self.cell_height - 1,
+            column * self.cell_width + 1 + self.shift_x,
+            row * self.cell_height + 1 + self.shift_y,
+            (column + 1) * self.cell_width - 1 + self.shift_x,
+            (row + 1) * self.cell_height - 1 + self.shift_y,
             fill="white",
             outline="white",
         )
