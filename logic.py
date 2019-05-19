@@ -73,3 +73,13 @@ class GameMatrix:
             (row - 1, column + 1),
             (row + 1, column - 1),
         }
+
+    def add_pattern(self, name, shift_x, shift_y):
+        if name == "block":
+            self._add_block(shift_x, shift_y)
+
+    def _add_block(self, shift_x, shift_y):
+        self[(shift_x, shift_y)] = True
+        self[(shift_x, shift_y + 1)] = True
+        self[(shift_x + 1, shift_y)] = True
+        self[(shift_x + 1, shift_y + 1)] = True

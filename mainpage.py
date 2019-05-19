@@ -1,4 +1,17 @@
-from tkinter import Label, Frame, Canvas, N, E, S, W, Button, IntVar, Entry
+from tkinter import (
+    Label,
+    Frame,
+    Canvas,
+    N,
+    E,
+    S,
+    W,
+    Button,
+    IntVar,
+    Entry,
+    Listbox,
+    StringVar,
+)
 from logic import GameMatrix
 
 
@@ -77,6 +90,11 @@ class GameGrid(Canvas):
             self.matrix[row, column] = False
             self._draw_dead_cell(row, column)
 
+    def add_pattern(self, name):
+        self.matrix.add_pattern("block", 10, 10)
+        for row, column in self.matrix.alive:
+            self._draw_alive_cell(row, column)
+
     def _draw_alive_cell(self, row, column):
         if self.cell_draws[row][column]:
             self.delete(self.cell_draws[row][column])
@@ -120,10 +138,7 @@ class App(AppBase):
         self.step_button.grid(row=4, column=1, sticky=E + W, padx=5, pady=7)
         self.clear_button = Button(self, text="Clear", command=self.clear)
         self.clear_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
-        self.add_pattern_button = Button(self, text="AddPattern")
-        self.add_pattern_button.grid(
-            row=6, column=1, sticky=E + W, padx=5, pady=7
-        )
+        self._create_pattern_frame()
 
     def _create_step_time_frame(self):
         self.step_time_frame = Frame(self)
@@ -143,6 +158,25 @@ class App(AppBase):
         )
         self.ms_label = Label(self.step_time_frame, text="ms")
         self.ms_label.grid(row=2, column=3, sticky=E + W, padx=5, pady=7)
+
+    def _create_pattern_frame(self):
+        self.patterns_list = ["block"]
+        self.patterns_var = StringVar(value=self.patterns_list)
+        self.pattern_frame = Frame(self)
+        self.pattern_frame.grid(row=6, column=1, sticky=E + W, padx=5, pady=7)
+        self.add_pattern_button = Button(
+            self.pattern_frame, text="Add Pattern", command=self.add_pattern
+        )
+        self.add_pattern_button.grid(
+            row=0, column=1, sticky=E + W, padx=5, pady=7
+        )
+        self.pattern_chooser = Listbox(
+            self.pattern_frame, listvariable=self.patterns_var
+        )
+        self.pattern_chooser.selection_set(0)
+        self.pattern_chooser.grid(
+            row=1, column=1, sticky=E + W, padx=5, pady=7
+        )
 
     def one_step(self):
         self.game_grid.make_step()
@@ -164,6 +198,10 @@ class App(AppBase):
 
     def clear(self):
         self.game_grid.clear()
+
+    def add_pattern(self):
+        pattern_name = self.pattern_chooser.selection_get()
+        self.game_grid.add_pattern(pattern_name)
 
 
 if __name__ == "__main__":
