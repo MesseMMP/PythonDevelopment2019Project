@@ -85,10 +85,10 @@ class GameGrid(Canvas):
     def right_click(self, event):
         self.right_x0 = event.x
         self.right_y0 = event.y
-        self.items = self.find_all()
 
     def right_move(self, event):
-        for item in self.items:
+        items = self.find_all()
+        for item in items:
             self.move(item, event.x - self.right_x0, event.y - self.right_y0)
         self.shift_x += event.x - self.right_x0
         self.shift_y += event.y - self.right_y0
