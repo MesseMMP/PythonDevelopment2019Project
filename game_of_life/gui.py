@@ -12,7 +12,7 @@ from tkinter import (
     Listbox,
     StringVar,
 )
-from logic import GameMatrix
+from game_of_life.logic import GameMatrix
 
 
 class AppBase(Frame):
@@ -237,6 +237,10 @@ class App(AppBase):
         self.game_grid.add_pattern(pattern_name)
 
 
-if __name__ == "__main__":
+def main():
     Tick = App()
     Tick.mainloop()
+
+
+if __name__ == "__main__":
+    main()
