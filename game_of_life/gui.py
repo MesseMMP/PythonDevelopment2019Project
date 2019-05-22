@@ -12,7 +12,7 @@ from tkinter import (
     Listbox,
     StringVar,
 )
-from game_of_life.logic import GameMatrix
+from logic import GameMatrix
 
 
 class AppBase(Frame):
@@ -40,6 +40,7 @@ class GameGrid(Canvas):
         self.cell_width = 15
         self.cell_height = 15
         self.cell_draws = [[None for c in range(columns)] for r in range(rows)]
+        self.cell_color = "red"
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
         self.shift_x = 0
@@ -136,7 +137,7 @@ class GameGrid(Canvas):
             row * self.cell_height + 1 + self.shift_y,
             (column + 1) * self.cell_width - 1 + self.shift_x,
             (row + 1) * self.cell_height - 1 + self.shift_y,
-            fill="black",
+            fill=self.cell_color,
         )
         self.cell_draws[row][column] = cell_draw_id
 
@@ -157,7 +158,7 @@ class GameGrid(Canvas):
 class App(AppBase):
     def create(self):
         self.game_grid = GameGrid(self)
-        self.game_grid.grid(row=0, column=0, rowspan=7, sticky=N + E + S + W)
+        self.game_grid.grid(row=0, column=0, rowspan=8, sticky=N + E + S + W)
         self.start_call_id = None
         self._create_buttons()
 
@@ -172,6 +173,7 @@ class App(AppBase):
         self.clear_button = Button(self, text="Clear", command=self.clear)
         self.clear_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
         self._create_pattern_frame()
+        self._create_color_frame()
 
     def _create_step_time_frame(self):
         self.step_time_frame = Frame(self)
@@ -195,21 +197,47 @@ class App(AppBase):
     def _create_pattern_frame(self):
         self.patterns_list = ["block"]
         self.patterns_var = StringVar(value=self.patterns_list)
-        self.pattern_frame = Frame(self)
-        self.pattern_frame.grid(row=6, column=1, sticky=E + W, padx=5, pady=7)
+        self.pattern_frame = Frame(self, bg="cyan")
+        self.pattern_frame.grid(row=6, column=1, sticky=N + E + S + W)
         self.add_pattern_button = Button(
             self.pattern_frame, text="Add Pattern", command=self.add_pattern
         )
         self.add_pattern_button.grid(
-            row=0, column=1, sticky=E + W, padx=5, pady=7
+            row=0, sticky=E + W, padx=5, pady=7
         )
         self.pattern_chooser = Listbox(
             self.pattern_frame, listvariable=self.patterns_var
         )
         self.pattern_chooser.selection_set(0)
         self.pattern_chooser.grid(
-            row=1, column=1, sticky=E + W, padx=5, pady=7
+            row=1, sticky=E + W, padx=5, pady=7
         )
+
+    def _create_color_frame(self):
+        self.color_frame = Frame(self, bg="purple")
+        self.color_frame.grid_columnconfigure(0, weight=1)
+        self.color_frame.grid_columnconfigure(1, weight=1)
+        self.color_frame.grid(row=7, column=1, sticky=N + E + S + W)
+        self.change_color_button1 = Button(
+            self.color_frame, 
+            command=lambda: self.change_color("red"),
+            bg="red"
+        )
+        self.change_color_button1.grid(
+
+            row=0, column=0, sticky=E + W, padx=5, pady=7
+        )
+        self.change_color_button2 = Button(
+            self.color_frame, 
+            command=lambda: self.change_color("blue"),
+            bg="blue"
+        )
+        self.change_color_button2.grid(
+            row=0, column=1, sticky=E + W, padx=5, pady=7
+        )
+
+    def change_color(self, color):
+        self.game_grid.cell_color = color
 
     def one_step(self):
         self.game_grid.make_step()
