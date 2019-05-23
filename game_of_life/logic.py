@@ -2,8 +2,8 @@ class GameMatrix:
     def __init__(self, rows=200, columns=200):
         self.rows = rows
         self.columns = columns
-        self._alive = set()
-        self.died = set()
+        self._alive = dict()
+        self.dead = set()
 
     def __getitem__(self, position):
         row, column = position
@@ -12,26 +12,26 @@ class GameMatrix:
             and row < self.rows
             and column > 0
             and column < self.columns
-            and (row, column) in self._alive
+            and (row, column) in self._alive.keys()
         )
 
     def __setitem__(self, position, value):
         row, column = position
         if row < 0 or row > self.rows or column < 0 or column > self.columns:
             return
-        if value is True:
-            self._alive.add((row, column))
-        elif value is False:
-            self._alive.discard((row, column))
+        if value:
+            self._alive[row, column] = value
+        else:
+            del self._alive[row, column]
 
     def make_step(self):
-        self.died = set()
+        self.dead = set()
         new_alive = self.alive
         for cell in self._alive:
             alive_neighbours = self.alive_neighbours(cell)
             if len(alive_neighbours) < 2 or len(alive_neighbours) > 3:
                 new_alive.remove(cell)
-                self.died.add(cell)
+                self.dead.add(cell)
         for cell in self.all_dead_neighbours:
             alive_neighbours = self.alive_neighbours(cell)
             if (
@@ -56,10 +56,10 @@ class GameMatrix:
         return res
 
     def alive_neighbours(self, cell):
-        return self.neighbours(cell) & self._alive
+        return self.neighbours(cell) & self._alive.keys()
 
     def dead_neighbours(self, cell):
-        return self.neighbours(cell) - self._alive
+        return self.neighbours(cell) - self._alive.keys()
 
     def neighbours(self, cell):
         row, column = cell

@@ -40,7 +40,9 @@ class GameGrid(Canvas):
         self.cell_width = 15
         self.cell_height = 15
         self.cell_draws = [[None for c in range(columns)] for r in range(rows)]
-        self.cell_color = "red"
+        self.ALIVE_COLORS = ("red", "blue")
+        self.DEAD_COLOR = "white"
+        self.chosen_color = self.ALIVE_COLORS[0]
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
         self.shift_x = 0
@@ -116,7 +118,7 @@ class GameGrid(Canvas):
         self.matrix.make_step()
         for row, column in self.matrix.alive:
             self._draw_alive_cell(row, column)
-        for row, column in self.matrix.died:
+        for row, column in self.matrix.dead:
             self._draw_dead_cell(row, column)
 
     def clear(self):
