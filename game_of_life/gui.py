@@ -12,7 +12,7 @@ from tkinter import (
     Listbox,
     StringVar,
 )
-from game_of_life.logic import GameMatrix
+from logic import GameMatrix
 
 
 class AppBase(Frame):
@@ -33,7 +33,7 @@ class AppBase(Frame):
 class GameGrid(Canvas):
     def __init__(self, master=None, chosen_color="red", rows=2000, columns=2000):
         Canvas.__init__(self, master)
-        self.bind("<Button-1>", self.click_cell)
+        self.bind("<Button-1>", self.click)
         self.bind("<B1-Motion>", self.hold_down_cell)
         self.bind("<Button-3>", self.right_click)
         self.bind("<B3-Motion>", self.right_move)
@@ -41,13 +41,14 @@ class GameGrid(Canvas):
         self.cell_height = 15
         self.cell_draws = [[None for c in range(columns)] for r in range(rows)]
         self.DEAD_COLOR = "white"
+        self.chosen_pattern = "cell"
         self.chosen_color = chosen_color
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
         self.shift_x = 0
         self.shift_y = 0
 
-    def click_cell(self, event):
+    def click(self, event):
         top_border = (
             event.y
             - (event.y - self.shift_y) % self.cell_height
@@ -60,12 +61,15 @@ class GameGrid(Canvas):
             return
         row = top_border // self.cell_height
         column = left_border // self.cell_width
-        if self.matrix[row, column]:
-            self.matrix[row, column] = None
-            self._draw_dead_cell(row, column)
+        if self.chosen_pattern == "cell":
+            if self.matrix[row, column]:
+                self.matrix[row, column] = None
+                self._draw_dead_cell(row, column)
+            else:
+                self.matrix[row, column] = self.chosen_color
+                self._draw_alive_cell(row, column, self.chosen_color)
         else:
-            self.matrix[row, column] = self.chosen_color
-            self._draw_alive_cell(row, column, self.chosen_color)
+            self.add_pattern(self.chosen_pattern, row, column)
 
     def hold_down_cell(self, event):
         top_border = (
@@ -125,8 +129,8 @@ class GameGrid(Canvas):
             self.matrix[row, column] = None
             self._draw_dead_cell(row, column)
 
-    def add_pattern(self, name):
-        self.matrix.add_pattern("block", 10, 10)
+    def add_pattern(self, name, row, column):
+        self.matrix.add_pattern("block", row, column, self.chosen_color)
         for row, column in self.matrix.alive:
             self._draw_alive_cell(row, column, self.chosen_color)
 
@@ -154,6 +158,9 @@ class GameGrid(Canvas):
             outline="white",
         )
         self.cell_draws[row][column] = cell_draw_id
+
+    def change_pattern(self, pattern):
+        self.chosen_pattern = pattern
 
 
 class App(AppBase):
@@ -200,9 +207,10 @@ class App(AppBase):
         self.patterns_list = ["block"]
         self.patterns_var = StringVar(value=self.patterns_list)
         self.pattern_frame = Frame(self, bg="cyan")
+        self.pattern_frame.grid_columnconfigure(0, weight=1)
         self.pattern_frame.grid(row=6, column=1, sticky=N + E + S + W)
         self.add_pattern_button = Button(
-            self.pattern_frame, text="Add Pattern", command=self.add_pattern
+            self.pattern_frame, text="Add Pattern", command=self.change_pattern
         )
         self.add_pattern_button.grid(
             row=0, sticky=E + W, padx=5, pady=7
@@ -262,9 +270,8 @@ class App(AppBase):
     def clear(self):
         self.game_grid.clear()
 
-    def add_pattern(self):
-        pattern_name = self.pattern_chooser.selection_get()
-        self.game_grid.add_pattern(pattern_name)
+    def change_pattern(self):
+        self.game_grid.change_pattern(self.pattern_chooser.selection_get())
 
 
 def main():
