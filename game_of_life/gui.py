@@ -130,8 +130,9 @@ class GameGrid(Canvas):
             self._draw_dead_cell(row, column)
 
     def add_pattern(self, name, row, column):
-        self.matrix.add_pattern("block", row, column, self.chosen_color)
-        for row, column in self.matrix.alive:
+        pattern_alive = self.matrix.add_pattern(
+            name, row, column, self.chosen_color)
+        for row, column in pattern_alive:
             self._draw_alive_cell(row, column, self.chosen_color)
 
     def _draw_alive_cell(self, row, column, color):
@@ -209,18 +210,27 @@ class App(AppBase):
         self.pattern_frame = Frame(self, bg="cyan")
         self.pattern_frame.grid_columnconfigure(0, weight=1)
         self.pattern_frame.grid(row=6, column=1, sticky=N + E + S + W)
+        self.add_cell_button = Button(
+            self.pattern_frame, text="Add Cell", 
+            command=lambda: self.change_pattern("cell")
+        )
+        self.add_cell_button.grid(
+            row=0, sticky=E + W, padx=5, pady=7
+        )
         self.add_pattern_button = Button(
-            self.pattern_frame, text="Add Pattern", command=self.change_pattern
+            self.pattern_frame, text="Add Pattern", 
+            command=lambda: self.change_pattern(
+                self.pattern_chooser.selection_get())
         )
         self.add_pattern_button.grid(
-            row=0, sticky=E + W, padx=5, pady=7
+            row=1, sticky=E + W, padx=5, pady=7
         )
         self.pattern_chooser = Listbox(
             self.pattern_frame, listvariable=self.patterns_var
         )
         self.pattern_chooser.selection_set(0)
         self.pattern_chooser.grid(
-            row=1, sticky=E + W, padx=5, pady=7
+            row=2, sticky=E + W, padx=5, pady=7
         )
 
     def _create_color_frame(self):
@@ -234,7 +244,6 @@ class App(AppBase):
             bg=self.ALIVE_COLORS[0]
         )
         self.change_color_button1.grid(
-
             row=0, column=0, sticky=E + W, padx=5, pady=7
         )
         self.change_color_button2 = Button(
@@ -270,8 +279,8 @@ class App(AppBase):
     def clear(self):
         self.game_grid.clear()
 
-    def change_pattern(self):
-        self.game_grid.change_pattern(self.pattern_chooser.selection_get())
+    def change_pattern(self, pattern):
+        self.game_grid.change_pattern(pattern)
 
 
 def main():
