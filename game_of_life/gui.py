@@ -12,7 +12,7 @@ from tkinter import (
     Listbox,
     StringVar,
 )
-from logic import GameMatrix
+from game_of_life.logic import GameMatrix
 
 
 class AppBase(Frame):
@@ -31,7 +31,7 @@ class AppBase(Frame):
 
 
 class GameGrid(Canvas):
-    def __init__(self, master=None, rows=2000, columns=2000):
+    def __init__(self, master=None, chosen_color="red", rows=2000, columns=2000):
         Canvas.__init__(self, master)
         self.bind("<Button-1>", self.click_cell)
         self.bind("<B1-Motion>", self.hold_down_cell)
@@ -40,9 +40,8 @@ class GameGrid(Canvas):
         self.cell_width = 15
         self.cell_height = 15
         self.cell_draws = [[None for c in range(columns)] for r in range(rows)]
-        self.ALIVE_COLORS = ("red", "blue")
         self.DEAD_COLOR = "white"
-        self.chosen_color = self.ALIVE_COLORS[0]
+        self.chosen_color = chosen_color
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
         self.shift_x = 0
@@ -62,11 +61,11 @@ class GameGrid(Canvas):
         row = top_border // self.cell_height
         column = left_border // self.cell_width
         if self.matrix[row, column]:
-            self.matrix[row, column] = False
+            self.matrix[row, column] = None
             self._draw_dead_cell(row, column)
         else:
-            self.matrix[row, column] = True
-            self._draw_alive_cell(row, column)
+            self.matrix[row, column] = self.chosen_color
+            self._draw_alive_cell(row, column, self.chosen_color)
 
     def hold_down_cell(self, event):
         top_border = (
@@ -82,8 +81,8 @@ class GameGrid(Canvas):
         row = top_border // self.cell_height
         column = left_border // self.cell_width
         if not self.matrix[row, column]:
-            self.matrix[row, column] = True
-            self._draw_alive_cell(row, column)
+            self.matrix[row, column] = self.chosen_color
+            self._draw_alive_cell(row, column, self.chosen_color)
 
     def right_click(self, event):
         self.right_x0 = event.x
@@ -106,7 +105,7 @@ class GameGrid(Canvas):
             0,
             self.grid_width,
             self.grid_height,
-            fill="white",
+            fill=self.DEAD_COLOR,
             outline="lightgray",
         )
         for x in range(self.cell_width, self.grid_width, self.cell_width):
@@ -116,22 +115,22 @@ class GameGrid(Canvas):
 
     def make_step(self):
         self.matrix.make_step()
-        for row, column in self.matrix.alive:
-            self._draw_alive_cell(row, column)
+        for (row, column), color in self.matrix.alive.items():
+            self._draw_alive_cell(row, column, color)
         for row, column in self.matrix.dead:
             self._draw_dead_cell(row, column)
 
     def clear(self):
-        for row, column in self.matrix.alive:
-            self.matrix[row, column] = False
+        for row, column in self.matrix.alive.keys():
+            self.matrix[row, column] = None
             self._draw_dead_cell(row, column)
 
     def add_pattern(self, name):
         self.matrix.add_pattern("block", 10, 10)
         for row, column in self.matrix.alive:
-            self._draw_alive_cell(row, column)
+            self._draw_alive_cell(row, column, self.chosen_color)
 
-    def _draw_alive_cell(self, row, column):
+    def _draw_alive_cell(self, row, column, color):
         if self.cell_draws[row][column]:
             self.delete(self.cell_draws[row][column])
         cell_draw_id = self.create_rectangle(
@@ -139,7 +138,7 @@ class GameGrid(Canvas):
             row * self.cell_height + 1 + self.shift_y,
             (column + 1) * self.cell_width - 1 + self.shift_x,
             (row + 1) * self.cell_height - 1 + self.shift_y,
-            fill=self.cell_color,
+            fill=color,
         )
         self.cell_draws[row][column] = cell_draw_id
 
@@ -151,7 +150,7 @@ class GameGrid(Canvas):
             row * self.cell_height + 1 + self.shift_y,
             (column + 1) * self.cell_width - 1 + self.shift_x,
             (row + 1) * self.cell_height - 1 + self.shift_y,
-            fill="white",
+            fill=self.DEAD_COLOR,
             outline="white",
         )
         self.cell_draws[row][column] = cell_draw_id
@@ -159,7 +158,8 @@ class GameGrid(Canvas):
 
 class App(AppBase):
     def create(self):
-        self.game_grid = GameGrid(self)
+        self.ALIVE_COLORS = ("red", "blue")
+        self.game_grid = GameGrid(self, chosen_color=self.ALIVE_COLORS[0])
         self.game_grid.grid(row=0, column=0, rowspan=8, sticky=N + E + S + W)
         self.start_call_id = None
         self._create_buttons()
@@ -222,8 +222,8 @@ class App(AppBase):
         self.color_frame.grid(row=7, column=1, sticky=N + E + S + W)
         self.change_color_button1 = Button(
             self.color_frame, 
-            command=lambda: self.change_color("red"),
-            bg="red"
+            command=lambda: self.change_color(self.ALIVE_COLORS[0]),
+            bg=self.ALIVE_COLORS[0]
         )
         self.change_color_button1.grid(
 
@@ -231,15 +231,15 @@ class App(AppBase):
         )
         self.change_color_button2 = Button(
             self.color_frame, 
-            command=lambda: self.change_color("blue"),
-            bg="blue"
+            command=lambda: self.change_color(self.ALIVE_COLORS[1]),
+            bg=self.ALIVE_COLORS[1]
         )
         self.change_color_button2.grid(
             row=0, column=1, sticky=E + W, padx=5, pady=7
         )
 
     def change_color(self, color):
-        self.game_grid.cell_color = color
+        self.game_grid.chosen_color = color
 
     def one_step(self):
         self.game_grid.make_step()
