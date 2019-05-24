@@ -137,7 +137,7 @@ class GameGrid(Canvas):
         for sh_y, sh_x in self.patterns[self.chosen_pattern]:
             x = sh_x + column
             y = sh_y + row
-            self.matrix[(y, x)] = self.chosen_color
+            self.matrix[y, x] = self.chosen_color
             self._draw_alive_cell(y, x, self.chosen_color)
 
     def _draw_alive_cell(self, row, column, color):
@@ -149,6 +149,7 @@ class GameGrid(Canvas):
             (column + 1) * self.cell_width - 1 + self.shift_x,
             (row + 1) * self.cell_height - 1 + self.shift_y,
             fill=color,
+            outline=color,
         )
         self.cell_draws[row][column] = cell_draw_id
 
@@ -161,7 +162,7 @@ class GameGrid(Canvas):
             (column + 1) * self.cell_width - 1 + self.shift_x,
             (row + 1) * self.cell_height - 1 + self.shift_y,
             fill=self.DEAD_COLOR,
-            outline="white",
+            outline=self.DEAD_COLOR,
         )
         self.cell_draws[row][column] = cell_draw_id
 
@@ -169,8 +170,8 @@ class GameGrid(Canvas):
         self.chosen_pattern = pattern
 
     def load_patterns(self):
-        with open("game_of_life/patterns.txt", "r") as pattern_file:
-            return json.loads(pattern_file.read())
+        with open("game_of_life/patterns.json", "r") as pattern_file:
+            return json.load(pattern_file)
 
 
 class App(AppBase):
