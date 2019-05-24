@@ -1,7 +1,8 @@
 {
     "Block": "OO OO",
-    "Blinker": "OOO",
     "Beehive": ".OO O..O .OO",
     "Boat": "OO O.O .O",
+    "Blinker": "OOO",
+    "Toad": ".OOO OOO",
     "Glider" : ".O. ..O OOO"
 }
