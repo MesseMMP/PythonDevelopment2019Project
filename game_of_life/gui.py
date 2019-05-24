@@ -1,3 +1,4 @@
+import json
 from tkinter import (
     Label,
     Frame,
@@ -12,7 +13,7 @@ from tkinter import (
     Listbox,
     StringVar,
 )
-from logic import GameMatrix
+from game_of_life.logic import GameMatrix
 
 
 class AppBase(Frame):
@@ -43,6 +44,7 @@ class GameGrid(Canvas):
         self.DEAD_COLOR = "white"
         self.chosen_pattern = "cell"
         self.chosen_color = chosen_color
+        self.patterns = self.load_patterns()
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
         self.shift_x = 0
@@ -69,7 +71,7 @@ class GameGrid(Canvas):
                 self.matrix[row, column] = self.chosen_color
                 self._draw_alive_cell(row, column, self.chosen_color)
         else:
-            self.add_pattern(self.chosen_pattern, row, column)
+            self.add_pattern(row, column)
 
     def hold_down_cell(self, event):
         top_border = (
@@ -129,11 +131,12 @@ class GameGrid(Canvas):
             self.matrix[row, column] = None
             self._draw_dead_cell(row, column)
 
-    def add_pattern(self, name, row, column):
-        pattern_alive = self.matrix.add_pattern(
-            name, row, column, self.chosen_color)
-        for row, column in pattern_alive:
-            self._draw_alive_cell(row, column, self.chosen_color)
+    def add_pattern(self, row, column):
+        for sh_y, sh_x in self.patterns[self.chosen_pattern]:
+            x = sh_x + column
+            y = sh_y + row
+            self.matrix[(y, x)] = self.chosen_color
+            self._draw_alive_cell(y, x, self.chosen_color)            
 
     def _draw_alive_cell(self, row, column, color):
         if self.cell_draws[row][column]:
@@ -162,6 +165,10 @@ class GameGrid(Canvas):
 
     def change_pattern(self, pattern):
         self.chosen_pattern = pattern
+
+    def load_patterns(self):
+        with open("game_of_life\patterns.txt", "r") as pattern_file:
+            return json.loads(pattern_file.read())
 
 
 class App(AppBase):
@@ -205,7 +212,7 @@ class App(AppBase):
         self.ms_label.grid(row=2, column=3, sticky=E + W, padx=5, pady=7)
 
     def _create_pattern_frame(self):
-        self.patterns_list = ["block"]
+        self.patterns_list = list(self.game_grid.patterns.keys())
         self.patterns_var = StringVar(value=self.patterns_list)
         self.pattern_frame = Frame(self, bg="cyan")
         self.pattern_frame.grid_columnconfigure(0, weight=1)
