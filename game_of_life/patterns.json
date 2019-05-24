@@ -7,5 +7,6 @@
     "Pulsar": "..OOO...OOO  O....O.O....O O....O.O....O O....O.O....O ..OOO...OOO  ..OOO...OOO O....O.O....O O....O.O....O O....O.O....O  ..OOO...OOO",
     "Clock": "..O O.O .O.O .O",
     "Queen bee shuttle": ".........O .......O.O ......O.O OO...O..O...........OO OO....O.O...........OO .......O.O .........O",
-    "Glider" : ".O. ..O OOO"
+    "Glider" : ".O. ..O OOO",
+    "Lightweight spaceship": ".O..O O O...O OOOO"
 }
