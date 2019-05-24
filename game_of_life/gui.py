@@ -167,7 +167,7 @@ class GameGrid(Canvas):
         self.chosen_pattern = pattern
 
     def load_patterns(self):
-        with open("game_of_life\patterns.txt", "r") as pattern_file:
+        with open("game_of_life/patterns.txt", "r") as pattern_file:
             return json.loads(pattern_file.read())
 
 
