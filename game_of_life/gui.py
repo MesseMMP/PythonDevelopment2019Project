@@ -175,7 +175,7 @@ class GameGrid(Canvas):
             patterns_plain_text = json.load(pattern_file)
         for pattern in patterns_plain_text:
             res[pattern] = []
-            for i, row in enumerate(patterns_plain_text[pattern].split()):
+            for i, row in enumerate(patterns_plain_text[pattern].split(" ")):
                 for j, character in enumerate(row):
                     if character == "O":
                         res[pattern].append((i, j))
