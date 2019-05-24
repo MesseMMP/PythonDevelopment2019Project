@@ -46,7 +46,7 @@ class GameGrid(Canvas):
         self.DEAD_COLOR = "white"
         self.chosen_pattern = "cell"
         self.chosen_color = chosen_color
-        self.patterns = self.load_patterns()
+        self.patterns = self._load_patterns()
         self.matrix = GameMatrix(rows=rows, columns=columns)
         self._create_grid()
         self.shift_x = 0
@@ -169,7 +169,7 @@ class GameGrid(Canvas):
     def change_pattern(self, pattern):
         self.chosen_pattern = pattern
 
-    def load_patterns(self):
+    def _load_patterns(self):
         with open("game_of_life/patterns.json", "r") as pattern_file:
             return json.load(pattern_file)
 
@@ -215,30 +215,26 @@ class App(AppBase):
         self.ms_label.grid(row=2, column=3, sticky=E + W, padx=5, pady=7)
 
     def _create_pattern_frame(self):
-        self.patterns_list = list(self.game_grid.patterns.keys())
+        self.patterns_list = list(["cell"] + list(self.game_grid.patterns))
         self.patterns_var = StringVar(value=self.patterns_list)
         self.pattern_frame = Frame(self, bg="cyan")
         self.pattern_frame.grid_columnconfigure(0, weight=1)
         self.pattern_frame.grid(row=6, column=1, sticky=N + E + S + W)
-        self.add_cell_button = Button(
-            self.pattern_frame,
-            text="Add Cell",
-            command=lambda: self.change_pattern("cell"),
+        self.pattern_label = Label(
+            self.pattern_frame, text="Choose pattern to add"
         )
-        self.add_cell_button.grid(row=0, sticky=E + W, padx=5, pady=7)
-        self.add_pattern_button = Button(
-            self.pattern_frame,
-            text="Add Pattern",
-            command=lambda: self.change_pattern(
-                self.pattern_chooser.selection_get()
-            ),
-        )
-        self.add_pattern_button.grid(row=1, sticky=E + W, padx=5, pady=7)
+        self.pattern_label.grid(row=0, sticky=E + W, padx=5, pady=7)
         self.pattern_chooser = Listbox(
             self.pattern_frame, listvariable=self.patterns_var
         )
         self.pattern_chooser.selection_set(0)
-        self.pattern_chooser.grid(row=2, sticky=E + W, padx=5, pady=7)
+        self.pattern_chooser.grid(row=1, sticky=E + W, padx=5, pady=7)
+        self.pattern_chooser.bind(
+            "<<ListboxSelect>>",
+            lambda event: self.change_pattern(
+                self.pattern_chooser.selection_get()
+            ),
+        )
 
     def _create_color_frame(self):
         self.color_frame = Frame(self, bg="purple")
