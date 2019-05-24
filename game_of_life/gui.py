@@ -32,7 +32,9 @@ class AppBase(Frame):
 
 
 class GameGrid(Canvas):
-    def __init__(self, master=None, chosen_color="red", rows=2000, columns=2000):
+    def __init__(
+        self, master=None, chosen_color="red", rows=2000, columns=2000
+    ):
         Canvas.__init__(self, master)
         self.bind("<Button-1>", self.click)
         self.bind("<B1-Motion>", self.hold_down_cell)
@@ -136,7 +138,7 @@ class GameGrid(Canvas):
             x = sh_x + column
             y = sh_y + row
             self.matrix[(y, x)] = self.chosen_color
-            self._draw_alive_cell(y, x, self.chosen_color)            
+            self._draw_alive_cell(y, x, self.chosen_color)
 
     def _draw_alive_cell(self, row, column, color):
         if self.cell_draws[row][column]:
@@ -218,27 +220,24 @@ class App(AppBase):
         self.pattern_frame.grid_columnconfigure(0, weight=1)
         self.pattern_frame.grid(row=6, column=1, sticky=N + E + S + W)
         self.add_cell_button = Button(
-            self.pattern_frame, text="Add Cell", 
-            command=lambda: self.change_pattern("cell")
+            self.pattern_frame,
+            text="Add Cell",
+            command=lambda: self.change_pattern("cell"),
         )
-        self.add_cell_button.grid(
-            row=0, sticky=E + W, padx=5, pady=7
-        )
+        self.add_cell_button.grid(row=0, sticky=E + W, padx=5, pady=7)
         self.add_pattern_button = Button(
-            self.pattern_frame, text="Add Pattern", 
+            self.pattern_frame,
+            text="Add Pattern",
             command=lambda: self.change_pattern(
-                self.pattern_chooser.selection_get())
+                self.pattern_chooser.selection_get()
+            ),
         )
-        self.add_pattern_button.grid(
-            row=1, sticky=E + W, padx=5, pady=7
-        )
+        self.add_pattern_button.grid(row=1, sticky=E + W, padx=5, pady=7)
         self.pattern_chooser = Listbox(
             self.pattern_frame, listvariable=self.patterns_var
         )
         self.pattern_chooser.selection_set(0)
-        self.pattern_chooser.grid(
-            row=2, sticky=E + W, padx=5, pady=7
-        )
+        self.pattern_chooser.grid(row=2, sticky=E + W, padx=5, pady=7)
 
     def _create_color_frame(self):
         self.color_frame = Frame(self, bg="purple")
@@ -246,17 +245,17 @@ class App(AppBase):
         self.color_frame.grid_columnconfigure(1, weight=1)
         self.color_frame.grid(row=7, column=1, sticky=N + E + S + W)
         self.change_color_button1 = Button(
-            self.color_frame, 
+            self.color_frame,
             command=lambda: self.change_color(self.ALIVE_COLORS[0]),
-            bg=self.ALIVE_COLORS[0]
+            bg=self.ALIVE_COLORS[0],
         )
         self.change_color_button1.grid(
             row=0, column=0, sticky=E + W, padx=5, pady=7
         )
         self.change_color_button2 = Button(
-            self.color_frame, 
+            self.color_frame,
             command=lambda: self.change_color(self.ALIVE_COLORS[1]),
-            bg=self.ALIVE_COLORS[1]
+            bg=self.ALIVE_COLORS[1],
         )
         self.change_color_button2.grid(
             row=0, column=1, sticky=E + W, padx=5, pady=7
