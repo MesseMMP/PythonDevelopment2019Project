@@ -170,8 +170,16 @@ class GameGrid(Canvas):
         self.chosen_pattern = pattern
 
     def _load_patterns(self):
+        res = {}
         with open("game_of_life/patterns.json", "r") as pattern_file:
-            return json.load(pattern_file)
+            patterns_plain_text = json.load(pattern_file)
+        for pattern in patterns_plain_text:
+            res[pattern] = []
+            for i, row in enumerate(patterns_plain_text[pattern].split()):
+                for j, character in enumerate(row):
+                    if character == "O":
+                        res[pattern].append((i, j))
+        return res
 
 
 class App(AppBase):
