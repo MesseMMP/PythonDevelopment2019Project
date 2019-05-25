@@ -10,6 +10,7 @@ Welcome to Conway's Game of Life's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   install
    api
 
 
