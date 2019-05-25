@@ -20,8 +20,8 @@ master_doc = 'index'
 # -- Project information -----------------------------------------------------
 
 project = "Conway's Game of Life"
-copyright = '2019, Andrew, Nikita, Anya'
-author = 'Andrew, Nikita, Anya'
+copyright = '2019, Andrei Verigin, Nikita Lobosov, Anna Stepko'
+author = 'Andrei Verigin, Nikita Lobosov, Anna Stepko'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
