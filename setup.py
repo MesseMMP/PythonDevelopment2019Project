@@ -15,6 +15,5 @@ setup(
     url="https://github.com/sudoandros/PythonDevelopment2019Project",
     packages=["game_of_life"],
     python_requires=">3, <4",
-    install_requires=['numpydoc'],
     entry_points={"console_scripts": ["game_of_life=game_of_life.gui:main"]},
 )
