@@ -1,4 +1,7 @@
 import json
+import os
+import gettext
+from pathlib import Path
 from tkinter import (
     Label,
     Frame,
@@ -14,6 +17,11 @@ from tkinter import (
     StringVar,
 )
 from game_of_life.logic import GameMatrix
+
+localedir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale")
+ru = gettext.translation("gui", localedir=localedir, languages=["ru"])
+ru.install()
+_ = ru.gettext
 
 
 class AppBase(Frame):
@@ -32,9 +40,7 @@ class AppBase(Frame):
 
 
 class GameGrid(Canvas):
-    def __init__(
-        self, master=None, chosen_color="red", rows=2000, columns=2000
-    ):
+    def __init__(self, master=None, chosen_color="red", rows=2000, columns=2000):
         Canvas.__init__(self, master)
         self.bind("<Button-1>", self.click)
         self.bind("<B1-Motion>", self.hold_down_cell)
@@ -54,9 +60,7 @@ class GameGrid(Canvas):
 
     def click(self, event):
         top_border = (
-            event.y
-            - (event.y - self.shift_y) % self.cell_height
-            - self.shift_y
+            event.y - (event.y - self.shift_y) % self.cell_height - self.shift_y
         )
         left_border = (
             event.x - (event.x - self.shift_x) % self.cell_width - self.shift_x
@@ -77,9 +81,7 @@ class GameGrid(Canvas):
 
     def hold_down_cell(self, event):
         top_border = (
-            event.y
-            - (event.y - self.shift_y) % self.cell_height
-            - self.shift_y
+            event.y - (event.y - self.shift_y) % self.cell_height - self.shift_y
         )
         left_border = (
             event.x - (event.x - self.shift_x) % self.cell_width - self.shift_x
@@ -171,7 +173,7 @@ class GameGrid(Canvas):
 
     def _load_patterns(self):
         res = {}
-        with open("game_of_life/patterns.json", "r") as pattern_file:
+        with open(Path(__file__).parent / "patterns.json", "r") as pattern_file:
             patterns_plain_text = json.load(pattern_file)
         for pattern in patterns_plain_text:
             res[pattern] = []
@@ -191,14 +193,14 @@ class App(AppBase):
         self._create_buttons()
 
     def _create_buttons(self):
-        self.start_button = Button(self, text="Start", command=self.start)
+        self.start_button = Button(self, text=_("Start"), command=self.start)
         self.start_button.grid(row=1, column=1, sticky=E + W, padx=5, pady=7)
         self._create_step_time_frame()
-        self.stop_button = Button(self, text="Stop", command=self.stop)
+        self.stop_button = Button(self, text=_("Stop"), command=self.stop)
         self.stop_button.grid(row=3, column=1, sticky=E + W, padx=5, pady=7)
-        self.step_button = Button(self, text="Step", command=self.one_step)
+        self.step_button = Button(self, text=_("Step"), command=self.one_step)
         self.step_button.grid(row=4, column=1, sticky=E + W, padx=5, pady=7)
-        self.clear_button = Button(self, text="Clear", command=self.clear)
+        self.clear_button = Button(self, text=_("Clear"), command=self.clear)
         self.clear_button.grid(row=5, column=1, sticky=E + W, padx=5, pady=7)
         self._create_pattern_frame()
         self._create_color_frame()
@@ -206,20 +208,14 @@ class App(AppBase):
     def _create_step_time_frame(self):
         self.step_time_frame = Frame(self)
         self.step_time_frame.grid(row=2, column=1)
-        self.step_time_label = Label(
-            self.step_time_frame, text="Time of one step is"
-        )
-        self.step_time_label.grid(
-            row=2, column=1, sticky=E + W, padx=5, pady=7
-        )
+        self.step_time_label = Label(self.step_time_frame, text=_("Time of one step is"))
+        self.step_time_label.grid(row=2, column=1, sticky=E + W, padx=5, pady=7)
         self.step_time_var = IntVar(value=500)
         self.step_time_entry = Entry(
             self.step_time_frame, textvariable=self.step_time_var, width=10
         )
-        self.step_time_entry.grid(
-            row=2, column=2, sticky=E + W, padx=5, pady=7
-        )
-        self.ms_label = Label(self.step_time_frame, text="ms")
+        self.step_time_entry.grid(row=2, column=2, sticky=E + W, padx=5, pady=7)
+        self.ms_label = Label(self.step_time_frame, text=_("ms"))
         self.ms_label.grid(row=2, column=3, sticky=E + W, padx=5, pady=7)
 
     def _create_pattern_frame(self):
@@ -228,9 +224,7 @@ class App(AppBase):
         self.pattern_frame = Frame(self, bg="cyan")
         self.pattern_frame.grid_columnconfigure(0, weight=1)
         self.pattern_frame.grid(row=6, column=1, sticky=N + E + S + W)
-        self.pattern_label = Label(
-            self.pattern_frame, text="Choose pattern to add"
-        )
+        self.pattern_label = Label(self.pattern_frame, text=_("Choose pattern to add"))
         self.pattern_label.grid(row=0, sticky=E + W, padx=5, pady=7)
         self.pattern_chooser = Listbox(
             self.pattern_frame, listvariable=self.patterns_var
@@ -239,9 +233,7 @@ class App(AppBase):
         self.pattern_chooser.grid(row=1, sticky=E + W, padx=5, pady=7)
         self.pattern_chooser.bind(
             "<<ListboxSelect>>",
-            lambda event: self.change_pattern(
-                self.pattern_chooser.selection_get()
-            ),
+            lambda event: self.change_pattern(self.pattern_chooser.selection_get()),
         )
 
     def _create_color_frame(self):
@@ -254,17 +246,13 @@ class App(AppBase):
             command=lambda: self.change_color(self.ALIVE_COLORS[0]),
             bg=self.ALIVE_COLORS[0],
         )
-        self.change_color_button1.grid(
-            row=0, column=0, sticky=E + W, padx=5, pady=7
-        )
+        self.change_color_button1.grid(row=0, column=0, sticky=E + W, padx=5, pady=7)
         self.change_color_button2 = Button(
             self.color_frame,
             command=lambda: self.change_color(self.ALIVE_COLORS[1]),
             bg=self.ALIVE_COLORS[1],
         )
-        self.change_color_button2.grid(
-            row=0, column=1, sticky=E + W, padx=5, pady=7
-        )
+        self.change_color_button2.grid(row=0, column=1, sticky=E + W, padx=5, pady=7)
 
     def change_color(self, color):
         self.game_grid.chosen_color = color

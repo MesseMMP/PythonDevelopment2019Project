@@ -1,10 +1,17 @@
+from pathlib import Path
 from setuptools import setup
 from os import path
 
-here = path.abspath(path.dirname(__file__))
+here = Path(__file__).parent.resolve()
 
-with open(path.join(here, "README.md"), "r", encoding="utf-8") as file:
+with open(here / "README.md") as file:
     long_description = file.read()
+
+data_files = [str(here / "game_of_life" / "patterns.json")]
+for path in (here / "game_of_life" / "locale").glob('**/*.mo'):
+    data_files.append(str(path))
+for path in (here / "game_of_life" / "locale").glob('**/*.po'):
+    data_files.append(str(path))
 
 setup(
     name="game-of-life",
@@ -16,4 +23,5 @@ setup(
     packages=["game_of_life"],
     python_requires=">3, <4",
     entry_points={"console_scripts": ["game_of_life=game_of_life.gui:main"]},
+    package_data={"game_of_life": data_files},
 )

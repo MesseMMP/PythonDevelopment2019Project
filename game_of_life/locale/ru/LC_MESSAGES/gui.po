@@ -1,0 +1,45 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2019-05-27 00:25+MSK\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: gui.py:196
+msgid "Start"
+msgstr "Запустить"
+
+#: gui.py:199
+msgid "Stop"
+msgstr "Остановить"
+
+#: gui.py:201
+msgid "Step"
+msgstr "Шаг"
+
+#: gui.py:203
+msgid "Clear"
+msgstr "Очистить"
+
+#: gui.py:211
+msgid "Time of one step is"
+msgstr "Время одного шага:"
+
+#: gui.py:218
+msgid "ms"
+msgstr "мс"
+
+#: gui.py:227
+msgid "Choose pattern to add"
+msgstr "Выбрать шаблон для добавления"
+
