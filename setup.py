@@ -15,7 +15,7 @@ for path in (here / "game_of_life" / "locale").glob('**/*.po'):
 
 setup(
     name="game-of-life",
-    version="0.0.1",
+    version="1.0.0",
     description="Conway's Game of Life",
     long_description=long_description,
     long_description_content_type="text/markdown",
