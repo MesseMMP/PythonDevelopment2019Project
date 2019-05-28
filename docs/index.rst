@@ -12,6 +12,7 @@ Welcome to Conway's Game of Life's documentation!
 
    install
    api
+   gui
 
 
 Indices and tables
