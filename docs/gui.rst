@@ -13,15 +13,15 @@ Main Window contains:
 Game Grid
 ---------
 
-Game Grid is the area, where user can put patterns and watch Life-game processing.
+The area where user can put patterns and watch Life-game processing.
 Putting pattern on the Game Grid is executing by clicking on a chosen grid cell. 
-If you chose cell as a pattern you can also hold the mouse key and draw some number of cells by dragging the cursor.
+You can also hold the mouse key and draw some number of cells by dragging the cursor.
 
 
 Area of application process control
 -----------------------------------
 
-This area contains:
+Contains:
 
 * *Start Button*
 * *Step time field*
@@ -57,3 +57,14 @@ Used to delete all color cells from Game Grid.
 
 Area of pattern choosing
 ------------------------
+
+Contains a list of patterns which user can put on a Game Grid.
+User should choose pattern by clicking on it and then click on a cell where the left top corner of chosen pattern would be.
+
+
+Area of color choosing
+----------------------
+
+Contains two buttons of different color. 
+User can choose color of pattern he want to add by clicking on the corresponding button.
+Can be used for *Immigration* mode.

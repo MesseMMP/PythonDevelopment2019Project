@@ -16,7 +16,7 @@ from tkinter import (
     Listbox,
     StringVar,
 )
-from logic import GameMatrix
+from game_of_life.logic import GameMatrix
 
 localedir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale")
 ru = gettext.translation("gui", localedir=localedir, languages=["ru"])
