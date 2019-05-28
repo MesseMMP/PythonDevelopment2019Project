@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import gettext
@@ -18,10 +19,7 @@ from tkinter import (
 )
 from game_of_life.logic import GameMatrix
 
-localedir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale")
-ru = gettext.translation("gui", localedir=localedir, languages=["ru"])
-ru.install()
-_ = ru.gettext
+_ = gettext.gettext
 
 
 class AppBase(Frame):
@@ -208,7 +206,9 @@ class App(AppBase):
     def _create_step_time_frame(self):
         self.step_time_frame = Frame(self)
         self.step_time_frame.grid(row=2, column=1)
-        self.step_time_label = Label(self.step_time_frame, text=_("Time of one step is"))
+        self.step_time_label = Label(
+            self.step_time_frame, text=_("Time of one step is")
+        )
         self.step_time_label.grid(row=2, column=1, sticky=E + W, padx=5, pady=7)
         self.step_time_var = IntVar(value=500)
         self.step_time_entry = Entry(
@@ -283,6 +283,21 @@ class App(AppBase):
 
 
 def main():
+    global _
+    parser = argparse.ArgumentParser(description="Conway's Game of Life")
+    parser.add_argument(
+        "-l",
+        "--language",
+        help="Language of the application. Defaults to 'en'",
+        choices=["ru", "en"],
+        default="en",
+    )
+    args = parser.parse_args()
+    localedir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale")
+    if args.language == "ru":
+        ru = gettext.translation("gui", localedir=localedir, languages=["ru"])
+        ru.install()
+        _ = ru.gettext
     Tick = App()
     Tick.mainloop()
 
